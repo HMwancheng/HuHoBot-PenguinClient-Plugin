@@ -211,7 +211,8 @@ class YamlConfig(
         joinFormat = string("player-events.join.format", "[游戏] {name} 加入了服务器"),
         quitEnabled = boolean("player-events.quit.enabled", true),
         quitFormat = string("player-events.quit.format", "[游戏] {name} 离开了服务器"),
-        alwaysForward = boolean("player-events.always-forward", false)
+        alwaysForward = boolean("player-events.always-forward", false),
+        minOnlineSeconds = integer("player-events.min-online-seconds", 30)
     )
 
     fun markdownFiles(): Map<String, String> {

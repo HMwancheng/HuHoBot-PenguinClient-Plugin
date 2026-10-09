@@ -202,8 +202,11 @@ class HuHoBotVelocity @Inject constructor(
         ProxyBotApi.sendBotMarkdown(groupOpenId, markdown, keyboard)
 
     override fun broadcastMessage(msg: String) {
-        server.allPlayers.forEach { it.sendMessage(net.kyori.adventure.text.Component.text(msg)) }
-        redisManager?.broadcast(msg)
+        // 代理已直接发送给所有（含子服）玩家，再走 Redis 会导致每条消息重复一次。
+        // 使用 legacyAmpersand 解析 & 颜色代码。
+        val component = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+            .legacyAmpersand().deserialize(msg)
+        server.allPlayers.forEach { it.sendMessage(component) }
     }
 
     private fun initializeRedis() {

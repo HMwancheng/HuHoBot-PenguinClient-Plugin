@@ -32,6 +32,8 @@ chat-format:
 player-events:
   # false：遵循平台事件状态（如登录失败）；true：始终转发。
   always-forward: false
+  # 玩家在线时长达到该秒数后才发送进退服通知，用于过滤探针等短连接；0 表示不按在线时长过滤。
+  min-online-seconds: 30
   join:
     enabled: true
     # 可用占位符：{name}、{player}、{server}、{platform}
