@@ -22,6 +22,8 @@ on:
       - 'deps/qqpd-bot-java/**'
       - 'server/**'
       - 'build.gradle.kts'
+  # 支持在 Actions 页面或通过 gh workflow run 手动触发构建。
+  workflow_dispatch:
 
 env:
   GRADLE_VERSION: 8.14.5
