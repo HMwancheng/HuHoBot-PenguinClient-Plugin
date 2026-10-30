@@ -34,6 +34,9 @@ player-events:
   always-forward: false
   # 玩家在线时长达到该秒数后才发送进退服通知，用于过滤探针等短连接；0 表示不按在线时长过滤。
   min-online-seconds: 30
+  # 玩家名命中任一正则时不发送进退服通知（用于过滤脚本）；设为 [] 可关闭。
+  filter-name-regex:
+    - '^[A-Z][a-z]+[A-Z][a-z]+\d{4}$'
   join:
     enabled: true
     # 可用占位符：{name}、{player}、{server}、{platform}

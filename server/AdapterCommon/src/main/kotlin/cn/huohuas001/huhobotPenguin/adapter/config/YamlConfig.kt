@@ -11,6 +11,9 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.InputStream
 
+/** 脚本账号的默认命名规则：两段首字母大写单词 + 4 位数字，如 RoyalBear6721。 */
+private const val DEFAULT_PLAYER_NAME_FILTER_REGEX = "^[A-Z][a-z]+[A-Z][a-z]+\\d{4}$"
+
 /**
  * Allay、Nukkit 与代理端共享的轻量 YAML 配置读取器。
  *
@@ -35,6 +38,7 @@ class YamlConfig(
         reload()
         ensureAuthenticationOption()
         ensureAlwaysForwardPlayerEventsOption()
+        ensurePlayerNameFilterOption()
         ensureGroupMemberEventsOption()
         ensureConfigVersion()
     }
@@ -65,6 +69,31 @@ class YamlConfig(
             comment = "是否忽略平台的隐藏、取消或登录状态判断，始终转发进退服事件。",
             defaultValue = "false"
         )
+
+    /** 脚本账号的默认命名规则：两段首字母大写单词 + 4 位数字，如 RoyalBear6721。 */
+    private fun ensurePlayerNameFilterOption() {
+        if (node("player-events.filter-name-regex") != null) return
+
+        val original = file.readText(Charsets.UTF_8)
+        val newline = if (original.contains("\r\n")) "\r\n" else "\n"
+        val lines = original.split(Regex("\\r?\\n")).toMutableList()
+        val block = listOf(
+            "  # 玩家名命中任一正则时不发送进退服通知（用于过滤脚本）；设为 [] 可关闭。",
+            "  filter-name-regex:",
+            "    - '$DEFAULT_PLAYER_NAME_FILTER_REGEX'"
+        )
+        val sectionIndex = lines.indexOfFirst { it.trim() == "player-events:" }
+        if (sectionIndex >= 0) {
+            lines.addAll(sectionIndex + 1, block)
+        } else {
+            if (lines.isNotEmpty() && lines.last().isNotBlank()) lines.add("")
+            lines.add("player-events:")
+            lines.addAll(block)
+        }
+        file.writeText(lines.joinToString(newline), Charsets.UTF_8)
+        logger("已自动补充配置项: player-events.filter-name-regex")
+        reload()
+    }
 
     /** 为旧配置补充群成员事件订阅开关。 */
     private fun ensureGroupMemberEventsOption() =
@@ -212,7 +241,8 @@ class YamlConfig(
         quitEnabled = boolean("player-events.quit.enabled", true),
         quitFormat = string("player-events.quit.format", "[游戏] {name} 离开了服务器"),
         alwaysForward = boolean("player-events.always-forward", false),
-        minOnlineSeconds = integer("player-events.min-online-seconds", 30)
+        minOnlineSeconds = integer("player-events.min-online-seconds", 30),
+        filterNameRegex = stringList("player-events.filter-name-regex")
     )
 
     fun markdownFiles(): Map<String, String> {

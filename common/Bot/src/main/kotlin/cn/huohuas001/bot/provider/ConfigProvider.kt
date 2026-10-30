@@ -19,7 +19,9 @@ class PlayerEventFormat(
     /** 是否忽略平台事件的隐藏、取消或登录状态判断，始终转发进退服事件。 */
     val alwaysForward: Boolean = false,
     /** 玩家在线时长达到该秒数后才发送进退服通知，用于过滤探针等短连接；0 表示不按在线时长过滤。 */
-    val minOnlineSeconds: Int = 0
+    val minOnlineSeconds: Int = 0,
+    /** 玩家名命中任一正则时视为脚本，不发送进退服通知；空列表表示不过滤。 */
+    val filterNameRegex: List<String> = emptyList()
 )
 
 class Motd(
